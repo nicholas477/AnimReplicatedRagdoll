@@ -65,15 +65,6 @@ USkeletalMeshComponent* UReplicatedRagdollComponent::GetSkeletalMesh() const
 	return Cast<USkeletalMeshComponent>(GetAttachParent());
 }
 
-UAnimInstance* UReplicatedRagdollComponent::GetAnimationInstance() const
-{
-	if (USkeletalMeshComponent* SkeletalMesh = GetSkeletalMesh())
-	{
-		return SkeletalMesh->GetAnimInstance();
-	}
-	return nullptr;
-}
-
 void UReplicatedRagdollComponent::CaptureRagdoll(bool bOptimizeCapture)
 {
 	if (USkeletalMeshComponent* SkeletalMesh = GetSkeletalMesh())

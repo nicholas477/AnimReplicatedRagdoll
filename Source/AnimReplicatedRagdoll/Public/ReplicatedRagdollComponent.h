@@ -94,12 +94,16 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Ragdoll")
 	virtual USkeletalMeshComponent* GetSkeletalMesh() const;
 
-	UFUNCTION(BlueprintPure, Category = "Ragdoll")
-	virtual UAnimInstance* GetAnimationInstance() const;
-
+	// Reads the bone transforms from the skeletal mesh and copies them into AnimData.
+	// 
+	// bOptimizeCapture = true does an optimized network capture and only updates 
+	// bone transforms if they are more than 1cm or 1degree off.
 	UFUNCTION(BlueprintCallable, Category = "Ragdoll")
 	void CaptureRagdoll(bool bOptimizeCapture = true);
 
+	// Sets the skeletal mesh bone transforms to the bone transforms in AnimData.
+	//
+	// This only works if the skeletal mesh is in simulate physics mode.
 	UFUNCTION(BlueprintCallable, Category = "Ragdoll")
 	void ApplyRagdoll();
 
@@ -115,6 +119,7 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Ragdoll", ReplicatedUsing=OnRep_AnimData)
 	FReplicatedRagdollData AnimData;
 
+	// This is the anim data that the animation system actually uses.
 	TSharedPtr<FRagdollAnimData> AnimDataHandle;
 
 	UFUNCTION()

@@ -7,7 +7,8 @@
 #include "RRSkeletalMeshComponent.generated.h"
 
 /**
- * Don't use this class
+ * Don't use this class. This class is just used to get around 
+ * ApplyEditedComponentSpaceTransforms() being editor-only.
  */
 UCLASS(Abstract)
 class ANIMREPLICATEDRAGDOLL_API URRSkeletalMeshComponent : public USkeletalMeshComponent
