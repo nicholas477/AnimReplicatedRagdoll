@@ -2,7 +2,7 @@
 This plugin adds in a component and an animation node that replicates entire skeletal mesh ragdolls.
 
 ## How does it work?
-On the server side the skeletal mesh is simulated as usual and the bone transforms are captured on tick. The client side interps each bone to the replicated bone transform inside the animation node.
+On the server side the skeletal mesh is simulated as usual and the bone transforms are captured and replicated (if the bones have moved) on tick. The client side interps each bone to the replicated bone transform inside the animation node.
 
 ### Networking details
 The plugin has some network optimizations. If a bone hasn't changed its transform more than 1cm of translation or 1 degree of rotation then it is not updated over the network.
