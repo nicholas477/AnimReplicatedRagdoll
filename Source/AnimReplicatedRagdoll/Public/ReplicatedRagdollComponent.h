@@ -33,6 +33,18 @@ struct FRagdollAnimData
 		Data = NewData;
 	}
 
+	bool ReadEvaluateAnimation() const
+	{
+		FReadScopeLock Lock(DataLock);
+		return bEvaluateAnimation;
+	}
+
+	void WriteEvaluateAnimation(bool bNewEvaluateAnimation)
+	{
+		FWriteScopeLock Lock(DataLock);
+		bEvaluateAnimation = bNewEvaluateAnimation;
+	}
+
 	FReplicatedRagdollData GetInterpedRagdollData(float DeltaTime, float InterpSpeed) const
 	{
 		FReplicatedRagdollData OutData;
@@ -70,12 +82,11 @@ struct FRagdollAnimData
 		return OutData;
 	}
 
-	bool bEvaluateAnimation;
-
 protected:
 	mutable FRWLock DataLock;
 	FReplicatedRagdollData CurrentData;
 	FReplicatedRagdollData Data;
+	bool bEvaluateAnimation;
 };
 
 UCLASS( ClassGroup=(Ragdoll), meta = (BlueprintSpawnableComponent))
@@ -94,6 +105,10 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Ragdoll")
 	virtual USkeletalMeshComponent* GetSkeletalMesh() const;
 
+	// Empties the ragdoll data
+	UFUNCTION(BlueprintCallable, Category = "Ragdoll")
+	void ClearRagdoll();
+
 	// Reads the bone transforms from the skeletal mesh and copies them into AnimData.
 	// 
 	// bOptimizeCapture = true does an optimized network capture and only updates 
@@ -107,10 +122,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Ragdoll")
 	void ApplyRagdoll();
 
-	// Called on tick to decide if the ragdoll should be captured
+	// Called on tick on the server to decide if the ragdoll should be captured
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Ragdoll")
 	bool ShouldCaptureRagdoll();
 
+	// Called on tick to decide if the ragdoll animation node should apply the replicated
+	// bone data.
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Ragdoll")
 	bool ShouldApplyRagdoll();
 

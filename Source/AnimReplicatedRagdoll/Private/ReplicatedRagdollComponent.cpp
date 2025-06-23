@@ -19,10 +19,19 @@ void UReplicatedRagdollComponent::TickComponent(float DeltaTime, ELevelTick Tick
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (GetOwner()->HasAuthority() && ShouldCaptureRagdoll() && GetNetMode() != ENetMode::NM_Standalone)
+	if (GetOwner()->HasAuthority() && GetNetMode() != ENetMode::NM_Standalone)
 	{
-		CaptureRagdoll();
+		if (ShouldCaptureRagdoll())
+		{
+			CaptureRagdoll();
+		}
+		else
+		{
+			ClearRagdoll();
+		}
 	}
+
+	AnimDataHandle->WriteEvaluateAnimation(ShouldApplyRagdoll());
 }
 
 void UReplicatedRagdollComponent::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -41,7 +50,6 @@ void UReplicatedRagdollComponent::InitializeComponent()
 	if (!AnimDataHandle.IsValid())
 	{
 		AnimDataHandle = MakeShared<decltype(AnimDataHandle)::ElementType>();
-		AnimDataHandle->bEvaluateAnimation = !GetOwner()->HasAuthority();
 	}
 }
 
@@ -63,6 +71,17 @@ void UReplicatedRagdollComponent::Serialize(FArchive& Ar)
 USkeletalMeshComponent* UReplicatedRagdollComponent::GetSkeletalMesh() const
 {
 	return Cast<USkeletalMeshComponent>(GetAttachParent());
+}
+
+void UReplicatedRagdollComponent::ClearRagdoll()
+{
+	if (!AnimData.ComponentSpaceTransforms.IsEmpty())
+	{
+		AnimData.ComponentSpaceTransforms.Empty();
+		AnimData.MarkArrayDirty();
+
+		AnimDataHandle->WriteRagdollData(AnimData);
+	}
 }
 
 void UReplicatedRagdollComponent::CaptureRagdoll(bool bOptimizeCapture)
@@ -89,13 +108,22 @@ bool UReplicatedRagdollComponent::ShouldApplyRagdoll_Implementation()
 
 bool UReplicatedRagdollComponent::ShouldCaptureRagdoll_Implementation()
 {
+	USkeletalMeshComponent* SkeletalMesh = GetSkeletalMesh();
+	if (SkeletalMesh == nullptr)
+	{
+		return false;
+	}
+
+	if (!SkeletalMesh->IsSimulatingPhysics())
+	{
+		return false;
+	}
+
 	return true;
 }
 
 void UReplicatedRagdollComponent::OnRep_AnimData()
 {
-	//ApplyRagdoll();
-
 	USkeletalMeshComponent* SkeletalMesh = GetSkeletalMesh();
 	if (SkeletalMesh == nullptr)
 	{

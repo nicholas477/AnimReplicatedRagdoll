@@ -67,7 +67,7 @@ void FAnimNode_ReplicatedRagdoll::EvaluateComponentSpace_AnyThread(FComponentSpa
 
 	if (AnimDataHandle.IsValid())
 	{
-		if (!AnimDataHandle->bEvaluateAnimation || AnimDataHandle->ReadRagdollData().ComponentSpaceTransforms.Num() == 0)
+		if (!AnimDataHandle->ReadEvaluateAnimation() || AnimDataHandle->ReadRagdollData().ComponentSpaceTransforms.Num() == 0)
 		{
 			return;
 		}
