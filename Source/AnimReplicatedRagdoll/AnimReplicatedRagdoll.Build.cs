@@ -12,6 +12,7 @@ public class AnimReplicatedRagdoll : ModuleRules
 			new string[]
 			{
 				"Core",
+				"DeveloperSettings"
 			}
 		);
 			

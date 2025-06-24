@@ -114,7 +114,7 @@ bool UReplicatedRagdollComponent::ShouldCaptureRagdoll_Implementation()
 		return false;
 	}
 
-	if (!SkeletalMesh->IsSimulatingPhysics())
+	if (!SkeletalMesh->IsAnySimulatingPhysics())
 	{
 		return false;
 	}

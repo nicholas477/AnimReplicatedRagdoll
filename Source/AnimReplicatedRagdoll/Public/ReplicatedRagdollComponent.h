@@ -133,7 +133,7 @@ public:
 
 	TSharedPtr<FRagdollAnimData> GetAnimDataHandle() const { return AnimDataHandle; }
 protected:
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Ragdoll", ReplicatedUsing=OnRep_AnimData)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ragdoll", ReplicatedUsing=OnRep_AnimData)
 	FReplicatedRagdollData AnimData;
 
 	// This is the anim data that the animation system actually uses.

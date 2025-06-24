@@ -26,49 +26,56 @@ struct FReplicatedRagdollTransform : public FFastArraySerializerItem
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 };
 
-template<> struct TStructOpsTypeTraits<FReplicatedRagdollTransform> : public TStructOpsTypeTraitsBase2<FReplicatedRagdollTransform>
-{
-	enum
-	{
-		WithSerializer = true,
-		WithNetSerializer = true,
-	};
-};
-
 static FArchive& operator<<(FArchive& Ar, FReplicatedRagdollTransform& Value)
 {
 	Value.Serialize(Ar);
 	return Ar;
 }
 
+template<> struct TStructOpsTypeTraits<FReplicatedRagdollTransform> : public TStructOpsTypeTraitsBase2<FReplicatedRagdollTransform>
+{
+	enum
+	{
+		WithNetSerializer = true,
+		WithSerializer = true,
+	};
+};
+
 USTRUCT(BlueprintType)
 struct FReplicatedRagdollData : public FFastArraySerializer
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly)
 	TArray<FReplicatedRagdollTransform> ComponentSpaceTransforms;
 
 	void CapturePose(const USkeletalMeshComponent* SkeletalMesh, bool bOptimizeCapture = true);
 	void ApplyPose(USkeletalMeshComponent* SkeletalMesh);
+
+	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
+	{
+		return FFastArraySerializer::FastArrayDeltaSerialize<FReplicatedRagdollTransform, FReplicatedRagdollData>(ComponentSpaceTransforms, DeltaParms, *this);
+	}
 
 	bool Serialize(FArchive& Ar)
 	{
 		Ar << ComponentSpaceTransforms;
 		return true;
 	}
-
-	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
-	{
-		return FFastArraySerializer::FastArrayDeltaSerialize<FReplicatedRagdollTransform, FReplicatedRagdollData>(ComponentSpaceTransforms, DeltaParms, *this);
-	}
 };
+
+static FArchive& operator<<(FArchive& Ar, FReplicatedRagdollData& Value)
+{
+	Value.Serialize(Ar);
+	return Ar;
+}
+
 
 template<> struct TStructOpsTypeTraits<FReplicatedRagdollData> : public TStructOpsTypeTraitsBase2<FReplicatedRagdollData>
 {
 	enum
 	{
-		WithSerializer = true,
 		WithNetDeltaSerializer = true,
+		WithSerializer = true,
 	};
 };
