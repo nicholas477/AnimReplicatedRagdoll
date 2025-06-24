@@ -5,11 +5,11 @@ This plugin adds in a component and an animation node that replicates entire ske
 On the server side the skeletal mesh is simulated as usual and the bone transforms are captured and replicated (if the bones have moved) on tick. The client side interps each bone to the replicated bone transform inside the animation node.
 
 ### Networking details
-The plugin has some network optimizations. If a bone hasn't changed its transform more than 1cm of translation or 1 degree of rotation then it is not updated over the network.
+The plugin has some network optimizations. If a bone hasn't changed its transform then it is not updated over the network.
 
-Network transform updates are compressed. Translations are compressed using `FVector_NetQuantize10` and rotations are packed to 1 byte per axis. Bone scales are NOT replicated.
+Network transform updates are compressed. Translations are compressed using `FVector_NetQuantize` and rotations are packed to 1 or 2 bytes per axis. Bone scales are NOT replicated.
 
-_(TODO: @nicholas477 add support for variable precision network compression)_
+The network compression amount can be changed in your project settings, under Engine -> Anim Replicated Ragdoll Settings.
 
 # How to use
 1. Add the `Replicated Ragdoll` anim node to your skeletal mesh's animation BP and make sure your skeletal mesh is using that animation blueprint.
